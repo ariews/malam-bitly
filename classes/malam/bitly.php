@@ -8,25 +8,62 @@ defined('SYSPATH') or die('No direct script access.');
 
 class Malam_Bitly
 {
-    const API_URL = 'http://api.bit.ly/v3/';
+    /**
+     * Bitly API url
+     */
+    const API_URL               = 'http://api.bit.ly/v3/';
 
+    /**
+     * Config
+     *
+     * @var Config_Group
+     */
     protected $config;
 
+    /**
+     * Respond from Bitly
+     *
+     * @var string
+     */
     protected $respond;
 
-    public function __construct()
+    /**
+     * Instance
+     *
+     * @var array
+     */
+    protected $instance         = array();
+
+    /**
+     * Create instance
+     *
+     * @param string $group
+     */
+    public function __construct($group = 'default')
     {
-        $this->config = Kohana::$config->load('bitly');
+        $this->config = Kohana::$config->load("bitly.{$group}");
     }
 
-    public static function instance()
+    /**
+     * Get instance
+     *
+     * @param string $group
+     * @return Bitly
+     */
+    public static function instance($group = 'default')
     {
-        static $instance;
-        empty($instance) && $instance = new Bitly();
+        ! isset($this->instance[$group]) && $this->instance[$group] = new Bitly($group);
 
-        return $instance;
+        return $this->instance[$group];
     }
 
+    /**
+     * Shorten URL
+     *
+     * @param string $longUrl
+     * @return Bitly
+     * @throws Kohana_Exception
+     */
     public function shorten($longUrl)
     {
         $params = array(
@@ -54,21 +91,41 @@ class Malam_Bitly
         return $this;
     }
 
+    /**
+     * Error checker
+     *
+     * @return boolean
+     */
     public function is_error()
     {
         return $this->respond->status_code != 200;
     }
 
+    /**
+     * Error code
+     *
+     * @return integer
+     */
     public function error_code()
     {
         return $this->respond->status_code;
     }
 
+    /**
+     * Error message
+     *
+     * @return string
+     */
     public function error_msg()
     {
         return $this->respond->status_txt;
     }
 
+    /**
+     * URL
+     *
+     * @return string
+     */
     public function short()
     {
         return $this->respond->data->url;
