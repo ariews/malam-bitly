@@ -32,7 +32,7 @@ class Malam_Bitly
      *
      * @var array
      */
-    protected $instance         = array();
+    protected static $instance         = array();
 
     /**
      * Create instance
@@ -52,9 +52,9 @@ class Malam_Bitly
      */
     public static function instance($group = 'default')
     {
-        ! isset($this->instance[$group]) && $this->instance[$group] = new Bitly($group);
+        ! isset(self::$instance[$group]) && self::$instance[$group] = new Bitly($group);
 
-        return $this->instance[$group];
+        return self::$instance[$group];
     }
 
     /**
